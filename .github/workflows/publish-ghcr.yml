@@ -12,8 +12,8 @@
 # the Action uses on ghcr.io when no other credential is set. ghcr.io has no
 # referrers API, so the provenance appears as a sha256-<digest> fallback tag.
 #
-# Public: the package's visibility is set once by hand, in the package's
-# settings on GitHub (there is no API for it). New versions keep it.
+# Public: the package came out public on its first push (2026-11-03), from
+# this public repository; anyone can pull it without logging in.
 name: publish-ghcr
 
 on:
