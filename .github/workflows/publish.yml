@@ -1,0 +1,64 @@
+# Publish coffee/ as a settings image to artifacts.k8s.koudijs.dev.
+#
+# gitops-reverser commits the room's menu (and labelled Secrets, encrypted) into
+# coffee/resources/. Every such commit on main becomes an image:
+#
+#   artifacts.k8s.koudijs.dev/configbutler/coffee-settings:main                  moves; for people
+#   artifacts.k8s.koudijs.dev/configbutler/coffee-settings:main-<time>-<sha7>   never moves; Flux follows this
+#   artifacts.k8s.koudijs.dev/configbutler/coffee-settings:sha-<sha7>           the provenance's
+#
+# No secret: the job asks GitHub for an OIDC token with audience
+# artifacts.k8s.koudijs.dev, and zot accepts it only from this repository's
+# main branch, matched on its numeric IDs (repository_id 1443915668,
+# repository_owner_id 218629566). The plan is in ConfigButler/k8s,
+# k8s.koudijs.dev/docs/settings-image-publishing-plan.md.
+name: publish
+
+on:
+  push:
+    branches: [main]
+    paths: [coffee/**]
+  # To publish without a commit, e.g. after zot's trust rule changes. Only main
+  # gets a token zot accepts, so run it from main.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Publish in commit order: a later run must not finish before an earlier one.
+concurrency:
+  group: coffee-settings
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # the OIDC token zot checks
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # settings-image refuses a shallow clone
+      - id: settings
+        uses: ConfigButler/settings-image@e9c76bd50eeb247dd948b75220f8e0b9d71694b5 # v0.2.1
+        with:
+          path: coffee
+          repository: artifacts.k8s.koudijs.dev/configbutler/coffee-settings
+          oidc-audience: artifacts.k8s.koudijs.dev
+          timestamp-tag: ${{ github.ref_name }}
+      - name: Summary
+        env:
+          REFERENCE: ${{ steps.settings.outputs.reference }}
+          TAGS: ${{ steps.settings.outputs.tags }}
+          CHANGED: ${{ steps.settings.outputs.changed }}
+          SKIPPED: ${{ steps.settings.outputs.skipped }}
+        run: |
+          {
+            echo "### coffee-settings"
+            echo
+            echo "- reference: \`$REFERENCE\`"
+            echo "- tags: \`$TAGS\`"
+            echo "- changed: \`$CHANGED\`"
+            echo "- skipped: \`$SKIPPED\`"
+          } >> "$GITHUB_STEP_SUMMARY"
