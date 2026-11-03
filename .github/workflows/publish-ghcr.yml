@@ -40,7 +40,7 @@ jobs:
         with:
           fetch-depth: 0 # settings-image refuses a shallow clone
       - id: settings
-        uses: ConfigButler/settings-image@e9c76bd50eeb247dd948b75220f8e0b9d71694b5 # v0.2.1
+        uses: ConfigButler/settings-image@47defa5be3cafafc0a610a7f07a3a02a25fe4a2e # v0.2.2
         with:
           path: coffee
           repository: ghcr.io/configbutler/coffee-settings
