@@ -1,0 +1,60 @@
+# Publish coffee/ as a settings image to ghcr.io as well.
+#
+# The same folder, the same Action, the same digest as publish.yml: a settings
+# image does not care which registry holds it. Nothing in the cluster follows
+# this copy; it is here to show that.
+#
+#   ghcr.io/configbutler/coffee-settings:main
+#   ghcr.io/configbutler/coffee-settings:main-<time>-<sha7>
+#   ghcr.io/configbutler/coffee-settings:sha-<sha7>
+#
+# The credential is the workflow's own GITHUB_TOKEN with packages: write, which
+# the Action uses on ghcr.io when no other credential is set. ghcr.io has no
+# referrers API, so the provenance appears as a sha256-<digest> fallback tag.
+#
+# Public: the package's visibility is set once by hand, in the package's
+# settings on GitHub (there is no API for it). New versions keep it.
+name: publish-ghcr
+
+on:
+  push:
+    branches: [main]
+    paths: [coffee/**]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: coffee-settings-ghcr
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # GITHUB_TOKEN may push to this organisation's packages
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # settings-image refuses a shallow clone
+      - id: settings
+        uses: ConfigButler/settings-image@e9c76bd50eeb247dd948b75220f8e0b9d71694b5 # v0.2.1
+        with:
+          path: coffee
+          repository: ghcr.io/configbutler/coffee-settings
+          timestamp-tag: ${{ github.ref_name }}
+      - name: Summary
+        env:
+          REFERENCE: ${{ steps.settings.outputs.reference }}
+          TAGS: ${{ steps.settings.outputs.tags }}
+          CHANGED: ${{ steps.settings.outputs.changed }}
+        run: |
+          {
+            echo "### coffee-settings on ghcr.io"
+            echo
+            echo "- reference: \`$REFERENCE\`"
+            echo "- tags: \`$TAGS\`"
+            echo "- changed: \`$CHANGED\`"
+          } >> "$GITHUB_STEP_SUMMARY"
