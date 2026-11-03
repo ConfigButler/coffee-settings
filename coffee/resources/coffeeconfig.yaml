@@ -1,0 +1,24 @@
+apiVersion: examples.configbutler.ai/v1alpha1
+kind: CoffeeConfig
+metadata:
+  name: demo-coffee
+spec:
+  bannerText: Tha End
+  currency: YEN
+  mail:
+    apiKeySecretRef:
+      key: Ter
+      name: Tes
+  payments:
+    apiKeySecretRef:
+      key: Ns
+      name: Haa
+    zeroAmountCheckoutAllowed: false
+  products:
+    - description: Tea
+      enabled: true
+      name: Tea
+      priceCents: 1000
+      sku: coffee-filter
+  shopName: Hide
+  vouchers: []
