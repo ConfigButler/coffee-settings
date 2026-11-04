@@ -1,14 +1,14 @@
-# Publish coffee/ as a settings image to artifacts.k8s.koudijs.dev.
+# Publish coffee/ as a settings image to cr.k8s.koudijs.dev.
 #
 # gitops-reverser commits the room's menu (and labelled Secrets, encrypted) into
 # coffee/resources/. Every such commit on main becomes an image:
 #
-#   artifacts.k8s.koudijs.dev/configbutler/coffee-settings:main                  moves; for people
-#   artifacts.k8s.koudijs.dev/configbutler/coffee-settings:main-<time>-<sha7>   never moves; Flux follows this
-#   artifacts.k8s.koudijs.dev/configbutler/coffee-settings:sha-<sha7>           the provenance's
+#   cr.k8s.koudijs.dev/configbutler/coffee-settings:main                  moves; for people
+#   cr.k8s.koudijs.dev/configbutler/coffee-settings:main-<time>-<sha7>   never moves; Flux follows this
+#   cr.k8s.koudijs.dev/configbutler/coffee-settings:sha-<sha7>           the provenance's
 #
 # No secret: the job asks GitHub for an OIDC token with audience
-# artifacts.k8s.koudijs.dev, and zot accepts it only from this repository's
+# cr.k8s.koudijs.dev, and zot accepts it only from this repository's
 # main branch, matched on its numeric IDs (repository_id 1443915668,
 # repository_owner_id 218629566). The plan is in ConfigButler/k8s,
 # k8s.koudijs.dev/docs/settings-image-publishing-plan.md.
@@ -44,8 +44,8 @@ jobs:
         uses: ConfigButler/settings-image@47defa5be3cafafc0a610a7f07a3a02a25fe4a2e # v0.2.2
         with:
           path: coffee
-          repository: artifacts.k8s.koudijs.dev/configbutler/coffee-settings
-          oidc-audience: artifacts.k8s.koudijs.dev
+          repository: cr.k8s.koudijs.dev/configbutler/coffee-settings
+          oidc-audience: cr.k8s.koudijs.dev
           timestamp-tag: ${{ github.ref_name }}
       - name: Summary
         env:
