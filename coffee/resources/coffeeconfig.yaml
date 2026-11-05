@@ -22,5 +22,10 @@ spec:
       name: Cappucinooo
       priceCents: 504
       sku: cappucino
+    - description: Tea
+      enabled: true
+      name: Tea
+      priceCents: 39
+      sku: coffee-filter
   shopName: do this on stage!
   vouchers: []
