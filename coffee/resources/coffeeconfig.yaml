@@ -27,5 +27,5 @@ spec:
       name: Tea
       priceCents: 39
       sku: coffee-filter
-  shopName: NICE TALK!
+  shopName: NICE TALK!!
   vouchers: []
