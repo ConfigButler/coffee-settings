@@ -18,12 +18,12 @@ spec:
     provider: stripe
   products:
     - description: A very nice cop of ☕
-      enabled: false
+      enabled: true
       name: Cappucinooo
       priceCents: 504
       sku: cappucino
     - description: Tea
-      enabled: false
+      enabled: true
       name: Tea
       priceCents: 39
       sku: coffee-filter
